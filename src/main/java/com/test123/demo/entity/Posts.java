@@ -17,8 +17,8 @@ public class Posts {
     @Column(name = "post_id")
     private String id;
 
-    @Column(name = "user_id")
-    private String userId;
+//    @Column(name = "user_id")
+//    private String userId;
 
     @Column(name = "title")
     private String title;
@@ -36,6 +36,6 @@ public class Posts {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable=false, updatable=false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable=true, updatable=true)
     private User user;
 }

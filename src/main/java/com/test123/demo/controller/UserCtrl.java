@@ -50,7 +50,7 @@ public class UserCtrl {
                 .map(user -> RespWrapper.success(modelMapper.map(user, UserDto.class))).get();
     }
 
-    @Operation(summary = "會員登入")
+    @Operation(summary = "取得JWT token驗證")
     @PostMapping("/login")
     public RespWrapper<TokenPair> login(@RequestBody UserLogin body) {
         Option<TokenPair> userOption = userService.userLogin(body);

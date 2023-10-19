@@ -16,6 +16,6 @@ import java.util.Optional;
 public interface PostsRepository extends JpaRepository<Posts, String> {
     Page<Posts> findAll(Specification<Posts> spec, Pageable pageable);
 
-    @Query("SELECT p FROM Posts p WHERE p.id = :postId AND p.userId = :userId")
+    @Query("SELECT p FROM Posts p WHERE p.id = :postId AND p.user.id = :userId")
     Option<Posts> findByIdAndUserId(@Param("postId") String id,@Param("userId") String userId);
 }

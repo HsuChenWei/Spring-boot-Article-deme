@@ -2,9 +2,11 @@ package com.test123.demo.service.Impl;
 
 import com.test123.demo.entity.Posts;
 import com.test123.demo.entity.QPosts;
+import com.test123.demo.entity.User;
 import com.test123.demo.model.Posts.PostsCreate;
 import com.test123.demo.model.Posts.PostsUpdate;
 import com.test123.demo.repository.PostsRepository;
+import com.test123.demo.repository.UserRepository;
 import com.test123.demo.service.Impl.querydsl.QuerydslRepository;
 import com.test123.demo.service.PostsService;
 import io.vavr.control.Option;
@@ -20,12 +22,16 @@ import org.springframework.stereotype.Service;
 import javax.jdo.annotations.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostsServiceImpl implements PostsService {
 
     @Autowired
     private PostsRepository postsRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private QuerydslRepository querydsl;
@@ -89,9 +95,14 @@ public class PostsServiceImpl implements PostsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()){
+
             String userId = authentication.getName();
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (!userOptional.isPresent()) {
+                return Option.none();
+            }
             Posts newPosts = new Posts();
-            newPosts.setUserId(userId);
+            newPosts.setUser(userOptional.get());
             newPosts.setTitle(creation.getTitle());
             newPosts.setContent(creation.getContent());
             newPosts.setCreateAt(LocalDateTime.now());
@@ -118,7 +129,6 @@ public class PostsServiceImpl implements PostsService {
 
         if (authentication != null && authentication.isAuthenticated()){
             String currentUserId = authentication.getName();
-
 
             Option<Posts> optionalPost = postsRepository.findByIdAndUserId(id, currentUserId);
 

@@ -46,7 +46,7 @@ public class PostsReportsServiceImpl implements PostsReportsService {
                 throw new RuntimeException("Post not found");
             }
 
-            if (postOptional.get().getUserId().equals(currentUserId)) {
+            if (postOptional.get().getUser().equals(currentUserId)) {
                 throw new RuntimeException("Users cannot report their own posts");
             }
 
