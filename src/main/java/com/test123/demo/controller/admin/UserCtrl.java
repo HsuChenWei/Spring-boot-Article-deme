@@ -1,4 +1,4 @@
-package com.test123.demo.controller;
+package com.test123.demo.controller.admin;
 
 import com.test123.demo.entity.Role;
 import com.test123.demo.model.Role.RoleDto;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.vavr.control.Option;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/admin/user")
 @Tag(name = "User", description = "會員功能")
 public class UserCtrl {
 
@@ -35,6 +36,7 @@ public class UserCtrl {
 
 
     @Operation(summary = "取得所有會員資料")
+    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public RespWrapper<List<UserList>> getAllUser(){
         return RespWrapper.success(userService.getAllUserWithRole()
@@ -57,7 +59,7 @@ public class UserCtrl {
         return userOption
                 .map(u -> modelMapper.map(u ,TokenPair.class))
                 .map(RespWrapper::success)
-                .getOrElseThrow(() -> new RuntimeException("UserName or PassWord error."));
+                .getOrElseThrow(() -> new RuntimeException("UserName or PassWord is incorrect."));
     }
 
     @Operation(summary = "更新密碼, 信箱")
@@ -72,6 +74,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "刪除會員")
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/delete/{id}")
     public RespWrapper<Void> removeUser (@PathVariable @Parameter(description = "使用者ID", required = false) String id){
         userService.removeUser(id);
@@ -79,6 +82,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "更改會員角色")
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/changeRole/{userId}")
     public RespWrapper<UserDto> changeRole(@PathVariable String userId, Role body){
         return userService.changeRole(userId, body)

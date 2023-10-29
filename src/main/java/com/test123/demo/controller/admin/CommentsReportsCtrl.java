@@ -1,4 +1,4 @@
-package com.test123.demo.controller;
+package com.test123.demo.controller.admin;
 
 
 import com.test123.demo.model.CommentsReports.CommentsReportUpdate;
