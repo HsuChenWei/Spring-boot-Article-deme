@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import javax.jdo.annotations.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -159,11 +161,21 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found.");
         }
         User userUpdate = user.get();
-        String encoderPwd = passwordEncoder.encode(update.getUserPwd());
-        userUpdate.setUserPwd(encoderPwd);
-        userUpdate.setEmail(update.getEmail());
-        LocalDateTime updateRightNow = LocalDateTime.now();
-        userUpdate.setUpdateAt(updateRightNow);
+        // 檢查 update 物件的 userPwd 是否為 null 或空白。如果不是，則加密並更新。
+        if (update.getUserPwd() != null && !update.getUserPwd().trim().isEmpty()) {
+            String encoderPwd = passwordEncoder.encode(update.getUserPwd());
+            userUpdate.setUserPwd(encoderPwd);
+        }
+
+        // 檢查 update 物件的 email 是否為 null 或空白。如果不是，則更新。
+        if (update.getEmail() != null && !update.getEmail().trim().isEmpty()) {
+            userUpdate.setEmail(update.getEmail());
+        }
+        ZonedDateTime updateRightNow = ZonedDateTime.now(ZoneId.of("Asia/Taipei"));
+
+        LocalDateTime localDateTime = updateRightNow.toLocalDateTime();
+
+        userUpdate.setUpdateAt(localDateTime);
 
         User newUpdatUser = userRepository.save(userUpdate);
 

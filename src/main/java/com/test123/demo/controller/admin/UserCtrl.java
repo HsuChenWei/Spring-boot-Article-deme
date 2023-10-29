@@ -36,7 +36,7 @@ public class UserCtrl {
 
 
     @Operation(summary = "取得所有會員資料")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public RespWrapper<List<UserList>> getAllUser(){
         return RespWrapper.success(userService.getAllUserWithRole()
@@ -63,6 +63,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "更新密碼, 信箱")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
     public RespWrapper<UserDto> updateUser(@RequestBody UserUpdate body){
 
@@ -74,7 +75,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "刪除會員")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public RespWrapper<Void> removeUser (@PathVariable @Parameter(description = "使用者ID", required = false) String id){
         userService.removeUser(id);
@@ -82,7 +83,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "更改會員角色")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/changeRole/{userId}")
     public RespWrapper<UserDto> changeRole(@PathVariable String userId, Role body){
         return userService.changeRole(userId, body)
@@ -91,4 +92,5 @@ public class UserCtrl {
     }
 
 
+    //少一個忘記密碼該的api
 }

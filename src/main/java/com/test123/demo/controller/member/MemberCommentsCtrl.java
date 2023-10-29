@@ -1,4 +1,4 @@
-package com.test123.demo.controller.admin;
+package com.test123.demo.controller.member;
 
 
 import com.test123.demo.model.Comments.CommentsCreate;
@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/member/comments")
 @Tag(name = "Comments", description = "留言系統")
-public class CommentsCtrl {
+public class MemberCommentsCtrl {
 
     @Autowired
     private CommentsService commentsService;

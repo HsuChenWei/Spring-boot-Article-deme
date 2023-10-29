@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -49,39 +50,40 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
 
-//    @Override
-//    protected void configure(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity
-//                .formLogin()
-//                .disable()
-//                .httpBasic()
-//                .disable()
-//                .csrf()
-//                .disable();
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.GET, "/api/admin/**","/api/member/booking/**").authenticated()
-//                .antMatchers(HttpMethod.POST, "/api/admin/booking/**","/api/member/booking/**").authenticated()
-//                .antMatchers(HttpMethod.DELETE, "/api/admin/**","/api/member/booking/**").authenticated()
-//                .antMatchers(HttpMethod.PUT, "/api/admin/**","/api/member/booking/**").authenticated()
-//                .antMatchers(HttpMethod.GET,"/api/admin/**").hasAuthority("ADMIN")
-//                .antMatchers(HttpMethod.POST,"/api/admin/booking/**").hasAuthority("ADMIN")
-//                .antMatchers(HttpMethod.DELETE,"/api/admin/**").hasAuthority("ADMIN")
-//                .antMatchers(HttpMethod.PUT,"/api/admin/**").hasAuthority("ADMIN")
-//                .anyRequest()
-//                .permitAll();
-//    }
-
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf().disable() // 禁用 CSRF
+                .formLogin()
+                .disable()
+                .httpBasic()
+                .disable()
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .anyRequest().permitAll(); // 允許所有請求
+                .antMatchers("/api/admin/user/login","/api/user/user/register","/api/member/user/login","/api/member/user/register").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/admin/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.POST,"/api/admin/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/api/admin/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.PUT,"/api/admin/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/admin/**","/api/member/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/admin/**","/api/member/**").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/admin/**","/api/member/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/admin/**","/api/member/**").authenticated()
+                .anyRequest()
+                .permitAll();
     }
+
+//    @Override
+//    protected void configure(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity
+//                .csrf().disable() // 禁用 CSRF
+//                .authorizeRequests()
+//                .anyRequest().permitAll(); // 允許所有請求
+//    }
 
 
     @Bean

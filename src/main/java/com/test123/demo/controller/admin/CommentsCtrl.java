@@ -11,10 +11,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.vavr.control.Option;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/admin/comments")
 @Tag(name = "Comments", description = "留言系統")
 public class CommentsCtrl {
 
@@ -26,6 +27,7 @@ public class CommentsCtrl {
 
 
     @Operation(summary = "新增留言")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/post/{postId}/comment")
     public RespWrapper<CommentsDto> createComment(@PathVariable String postId,@RequestBody CommentsCreate creation){
         return commentsService.createComments(postId,creation)
@@ -35,10 +37,13 @@ public class CommentsCtrl {
     }
 
     @Operation(summary = "更新留言")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{commentId}/updateComment")
     public RespWrapper<CommentsDto> updateComment(@PathVariable String commentId, @RequestBody CommentsUpdate update){
         return commentsService.updateComment(commentId, update)
                 .map(u -> RespWrapper.success(modelMapper.map(u, CommentsDto.class)))
                 .getOrElseThrow(() -> new RuntimeException("Failed to update comment."));
     }
+
+    //少一個更改留言狀態(下架留言)
 }

@@ -1,6 +1,7 @@
-package com.test123.demo.controller.admin;
+package com.test123.demo.controller.member;
 
 
+import com.test123.demo.entity.Posts;
 import com.test123.demo.model.Posts.PostsCreate;
 import com.test123.demo.model.Posts.PostsDto;
 import com.test123.demo.model.Posts.PostsUpdate;
@@ -11,16 +12,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/member/post")
 @Tag(name = "Posts" ,description = "文章功能")
-public class PostsCtrl {
+public class MemberPostsCtrl {
 
     @Autowired
     private PostsService postsService;
@@ -37,19 +37,12 @@ public class PostsCtrl {
                 .getOrElseThrow(() -> new RuntimeException("Post not found."));
     }
 
-    @Operation(summary = "條件查詢")
-    @GetMapping("/filter")
-    public RespWrapper<List<PostsDto>> getFilterPosts(
-            @RequestParam(defaultValue = "0") @Parameter(description = "分頁索引 (0-based)", required = true) int page,
-            @RequestParam(defaultValue = "20") @Parameter(description = "分頁大小", required = true) int size,
-            @RequestParam(required = false) @Parameter(description = "文章編號") String postId,
-            @RequestParam(required = false) @Parameter(description = "使用者ID") String userId,
-            @RequestParam(required = false) @Parameter(description = "文章名稱") String title,
-            @RequestParam(required = false) @Parameter(description = "文章內容") String content
-    ){
-        return RespWrapper.success(postsService.getFilterPosts(page, size, postId, userId,title,content)
+    @Operation(summary = "所有文章")
+    @GetMapping("/allPosts")
+    public RespWrapper<List<PostsDto>> getOnShelfPosts() {
+        return RespWrapper.success(postsService.getAllOnShelfPosts()
                 .stream()
-                .map(posts -> modelMapper.map(posts, PostsDto.class))
+                .map(p -> modelMapper.map(p, PostsDto.class))
                 .collect(Collectors.toList()));
     }
 

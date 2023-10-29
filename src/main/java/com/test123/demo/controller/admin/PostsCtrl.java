@@ -1,8 +1,9 @@
-package com.test123.demo.controller;
+package com.test123.demo.controller.admin;
 
 
 import com.test123.demo.model.Posts.PostsCreate;
 import com.test123.demo.model.Posts.PostsDto;
+import com.test123.demo.model.Posts.PostsStatus;
 import com.test123.demo.model.Posts.PostsUpdate;
 import com.test123.demo.model.wrapper.RespWrapper;
 import com.test123.demo.service.PostsService;
@@ -12,13 +13,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/admin/post")
 @Tag(name = "Posts" ,description = "文章功能")
 public class PostsCtrl {
 
@@ -29,6 +31,7 @@ public class PostsCtrl {
     private ModelMapper modelMapper;
 
     @Operation(summary = "單一文章查詢")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public RespWrapper<PostsDto> getPost(@PathVariable String id){
         return postsService.getPostById(id)
@@ -38,6 +41,7 @@ public class PostsCtrl {
     }
 
     @Operation(summary = "條件查詢")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/filter")
     public RespWrapper<List<PostsDto>> getFilterPosts(
             @RequestParam(defaultValue = "0") @Parameter(description = "分頁索引 (0-based)", required = true) int page,
@@ -54,6 +58,7 @@ public class PostsCtrl {
     }
 
     @Operation(summary = "新增文章")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/creation")
     public RespWrapper<PostsDto> createPost(@RequestBody PostsCreate create){
         return postsService.createPost(create)
@@ -64,6 +69,7 @@ public class PostsCtrl {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "更新文章")
     public RespWrapper<PostsDto> updatePost(@PathVariable String id,@RequestBody PostsUpdate body){
         return postsService.updatePost(id, body)
@@ -73,9 +79,20 @@ public class PostsCtrl {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "刪除文章")
     public RespWrapper<Void> deletePost(@PathVariable String id){
         postsService.deletePost(id);
         return RespWrapper.success(null);
+    }
+
+    @Operation(summary = "上下架文章")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/updateStatus/{id}")
+    public RespWrapper<PostsDto> updateStatus(@PathVariable String id, @RequestBody PostsStatus body){
+        return postsService.changeStatus(id, body)
+                .map(s -> modelMapper.map(s, PostsDto.class))
+                .map(RespWrapper::success)
+                .getOrElseThrow(() -> new RuntimeException("Status can't change"));
     }
 }

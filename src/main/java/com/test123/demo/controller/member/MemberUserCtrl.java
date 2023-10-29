@@ -1,7 +1,6 @@
-package com.test123.demo.controller.admin;
+package com.test123.demo.controller.member;
 
 import com.test123.demo.entity.Role;
-import com.test123.demo.model.Role.RoleDto;
 import com.test123.demo.model.Security.TokenPair;
 import com.test123.demo.model.User.*;
 import com.test123.demo.model.wrapper.RespWrapper;
@@ -22,9 +21,9 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/admin/user")
+@RequestMapping("/api/member/user")
 @Tag(name = "User", description = "會員功能")
-public class UserCtrl {
+public class MemberUserCtrl {
 
 
     @Autowired
@@ -33,17 +32,6 @@ public class UserCtrl {
     @Autowired
     private ModelMapper modelMapper;
 
-
-
-    @Operation(summary = "取得所有會員資料")
-    @PreAuthorize("hasRole('admin')")
-    @GetMapping
-    public RespWrapper<List<UserList>> getAllUser(){
-        return RespWrapper.success(userService.getAllUserWithRole()
-                .stream()
-                .map(user -> modelMapper.map(user, UserList.class))
-                .collect(Collectors.toList()));
-    }
 
     @Operation(summary = "會員註冊")
     @PostMapping("/register")
@@ -63,6 +51,7 @@ public class UserCtrl {
     }
 
     @Operation(summary = "更新密碼, 信箱")
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/update")
     public RespWrapper<UserDto> updateUser(@RequestBody UserUpdate body){
 
@@ -72,23 +61,5 @@ public class UserCtrl {
                 .map(RespWrapper::success)
                 .getOrElseThrow(() -> new RuntimeException("Update failed."));
     }
-
-    @Operation(summary = "刪除會員")
-    @PreAuthorize("hasRole('admin')")
-    @DeleteMapping("/delete/{id}")
-    public RespWrapper<Void> removeUser (@PathVariable @Parameter(description = "使用者ID", required = false) String id){
-        userService.removeUser(id);
-        return RespWrapper.success(null);
-    }
-
-    @Operation(summary = "更改會員角色")
-    @PreAuthorize("hasRole('admin')")
-    @PutMapping("/changeRole/{userId}")
-    public RespWrapper<UserDto> changeRole(@PathVariable String userId, Role body){
-        return userService.changeRole(userId, body)
-                .map(user -> RespWrapper.success(modelMapper.map(user, UserDto.class)))
-                .getOrElseThrow(() -> new RuntimeException("Failed to change role."));
-    }
-
 
 }

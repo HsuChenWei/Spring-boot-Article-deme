@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,6 @@ public interface PostsRepository extends JpaRepository<Posts, String> {
 
     @Query("SELECT p FROM Posts p WHERE p.id = :postId AND p.user.id = :userId")
     Option<Posts> findByIdAndUserId(@Param("postId") String id,@Param("userId") String userId);
+
+    List<Posts> findByStatus(String number);
 }

@@ -95,7 +95,7 @@ public class OpenApiConfiguration {
         return GroupedOpenApi.builder()
                 .group("admin")
                 .packagesToScan("com.test123.demo.controller", "com.test123.demo.model", "com.test123.demo.error")
-                .pathsToMatch("/api/**")
+                .pathsToMatch("/api/admin/**")
                 .addOpenApiCustomiser(openAPICustomiser(getDefaultApiInfo()))
                 .build();
     }
@@ -105,7 +105,7 @@ public class OpenApiConfiguration {
         return GroupedOpenApi.builder()
                 .group("member")
                 .packagesToScan("com.test123.demo.controller", "com.test123.demo.model", "com.test123.demo.error")
-                .pathsToMatch("/api/**")
+                .pathsToMatch("/api/member/**")
                 .addOpenApiCustomiser(openAPICustomiser(getDefaultApiInfo()))
                 .build();
     }

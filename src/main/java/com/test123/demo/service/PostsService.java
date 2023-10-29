@@ -2,6 +2,7 @@ package com.test123.demo.service;
 
 import com.test123.demo.entity.Posts;
 import com.test123.demo.model.Posts.PostsCreate;
+import com.test123.demo.model.Posts.PostsStatus;
 import com.test123.demo.model.Posts.PostsUpdate;
 import io.vavr.control.Option;
 
@@ -22,5 +23,7 @@ public interface PostsService {
 
     Option<Posts> updatePost(String id, PostsUpdate update);
 
+    Option<Posts> changeStatus(String id, PostsStatus status);
 
+    List<Posts> getAllOnShelfPosts();
 }

@@ -9,10 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/commentsReports")
+@RequestMapping("/api/admin/commentsReports")
 @Tag(name = "Comments - Report", description = "留言檢舉系統")
 public class CommentsReportsCtrl {
 
@@ -23,6 +24,7 @@ public class CommentsReportsCtrl {
     private ModelMapper modelMapper;
 
     @Operation(summary = "狀態更改")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{commentReportId}")
     public RespWrapper<CommentsReportsDto> updateStatus(@PathVariable String commentReportId, CommentsReportUpdate update){
         return commentsReportsService.updateStatus(commentReportId, update)
@@ -31,6 +33,7 @@ public class CommentsReportsCtrl {
     }
 
     @Operation(summary = "留言檢舉")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/report/{commentId}")
     public RespWrapper<CommentsReportsDto> reportComments(String commentId, CommentsReportsDto body){
         return commentsReportsService.reportComment(commentId, body)

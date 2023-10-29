@@ -1,4 +1,4 @@
-package com.test123.demo.controller.admin;
+package com.test123.demo.controller.member;
 
 
 import com.test123.demo.model.CommentsReports.CommentsReportUpdate;
@@ -12,23 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/commentsReports")
+@RequestMapping("/api/member/commentsReports")
 @Tag(name = "Comments - Report", description = "留言檢舉系統")
-public class CommentsReportsCtrl {
+public class MemberCommentsReportsCtrl {
 
     @Autowired
     private CommentsReportsService commentsReportsService;
 
     @Autowired
     private ModelMapper modelMapper;
-
-    @Operation(summary = "狀態更改")
-    @PutMapping("/update/{commentReportId}")
-    public RespWrapper<CommentsReportsDto> updateStatus(@PathVariable String commentReportId, CommentsReportUpdate update){
-        return commentsReportsService.updateStatus(commentReportId, update)
-                .map(u -> RespWrapper.success(modelMapper.map(u , CommentsReportsDto.class)))
-                .getOrElseThrow(() -> new RuntimeException("Failed to update status"));
-    }
 
     @Operation(summary = "留言檢舉")
     @PostMapping("/report/{commentId}")

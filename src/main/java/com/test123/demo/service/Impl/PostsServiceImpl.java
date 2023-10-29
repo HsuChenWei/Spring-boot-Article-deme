@@ -1,10 +1,13 @@
 package com.test123.demo.service.Impl;
 
 import com.test123.demo.entity.Posts;
+import com.test123.demo.entity.PostsReports;
 import com.test123.demo.entity.QPosts;
 import com.test123.demo.entity.User;
 import com.test123.demo.model.Posts.PostsCreate;
+import com.test123.demo.model.Posts.PostsStatus;
 import com.test123.demo.model.Posts.PostsUpdate;
+import com.test123.demo.repository.PostsReportsRepository;
 import com.test123.demo.repository.PostsRepository;
 import com.test123.demo.repository.UserRepository;
 import com.test123.demo.service.Impl.querydsl.QuerydslRepository;
@@ -36,6 +39,9 @@ public class PostsServiceImpl implements PostsService {
     @Autowired
     private QuerydslRepository querydsl;
 
+    @Autowired
+    private PostsReportsRepository postsReportsRepository;
+
 
     @Override
     public Option<Posts> getPostById(String id) {
@@ -50,6 +56,12 @@ public class PostsServiceImpl implements PostsService {
     public List<Posts> getAllPosts() {
         return postsRepository.findAll();
     }
+
+    @Override
+    public List<Posts> getAllOnShelfPosts() {
+        return postsRepository.findByStatus("1");
+    }
+
 
     @Override
     public List<Posts> getFilterPosts(int page, int size, String postId, String userId, String title, String content) {
@@ -147,5 +159,35 @@ public class PostsServiceImpl implements PostsService {
         }
 
         return Option.none();
+    }
+
+    @Override
+    @Transactional
+    public Option<Posts> changeStatus(String id, PostsStatus status) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Please login first!");
+        }
+        Optional<Posts> postsOption = postsRepository.findById(id);
+
+        if (!postsOption.isPresent()){
+            throw new IllegalArgumentException("Post not found with id: " + id);
+        }
+
+        Posts posts = postsOption.get();
+        List<PostsReports> reports = postsReportsRepository.findAllByPostId(posts.getId());
+
+        if (reports.isEmpty()){
+            throw new RuntimeException("PostsReportId is not excited");
+        }
+        posts.setStatus(status.getStatus());
+        postsRepository.save(posts);
+
+        for (PostsReports report : reports){
+            report.setStatus("1");
+            postsReportsRepository.save(report);
+        }
+
+        return Option.of(posts);
     }
 }

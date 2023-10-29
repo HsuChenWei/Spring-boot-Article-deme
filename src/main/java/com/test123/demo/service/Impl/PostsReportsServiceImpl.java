@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,7 +33,6 @@ public class PostsReportsServiceImpl implements PostsReportsService {
 
     @Override
     public Option<PostsReports> reportPost(String postId,PostsReportsDto body) {
-
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()){
@@ -65,6 +65,7 @@ public class PostsReportsServiceImpl implements PostsReportsService {
     }
 
     @Override
+    @Transactional
     public Option<PostsReports> updatePostReportStatus(String postReportId, PostReportUpdateStatus status) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -77,10 +78,19 @@ public class PostsReportsServiceImpl implements PostsReportsService {
                 throw new RuntimeException("PostReport not exist.");
             }
             PostsReports postsReports =  postsReportsOptional.get();
-            postsReports.setStatus(status.getStatus());
+            String postId = postsReports.getPostId();
+            Optional<Posts> postOptional = postsRepository.findById(postId);
+            if (!postOptional.isPresent()) {
+                throw new RuntimeException("Post not found");
+            }
+            Posts post = postOptional.get();
+            post.setStatus("0");
+            postsRepository.save(post);
 
-            PostsReports newPostReport = postsReportsRepository.save(postsReports);
-            return Option.of(newPostReport);
+            postsReports.setStatus(status.getStatus());
+            PostsReports updatedPostReport = postsReportsRepository.save(postsReports);
+
+            return Option.of(updatedPostReport);
         }
         return Option.none();
     }
